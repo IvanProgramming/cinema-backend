@@ -38,7 +38,7 @@ async function getAllFilms(databaseId: string, token: string): Promise<Film[]> {
 }
 
 export async function getFilms(c: Context | HonoContext): Promise<Response> {
-    return (new OkResponse({ films: getAllFilms(c.env.NOTION_DATABASE_ID, c.env.NOTION_TOKEN) })).asJsonResponse(c)
+    return (new OkResponse({ films: await getAllFilms(c.env.NOTION_DATABASE_ID, c.env.NOTION_TOKEN) })).asJsonResponse(c)
 }
 
 export async function getFilm(c: Context | HonoContext) {
