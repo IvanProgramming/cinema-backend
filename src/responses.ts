@@ -43,6 +43,6 @@ export class ErrorResponse extends BaseResponse {
 
 export class NotFoundError extends ErrorResponse {
     constructor() {
-        super(1, "Endpoit not found", 404)
+        super(1, "Endpoint not found", 404)
     }
 }
