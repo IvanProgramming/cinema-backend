@@ -1,7 +1,7 @@
 import { Context } from "hono"
 import { HonoContext } from "hono/dist/context"
-import { OkResponse } from "./responses"
-import {DatabaseQueryResponse} from "./structs"
+import { OkResponse, FilmDontExists } from "./responses"
+import { DatabaseQueryResponse, Film } from "./structs"
 
 export class NotionApiClient {
     secretToken: string = ""
@@ -31,9 +31,22 @@ export class NotionApiClient {
     }
 }
 
-export async function getFilms(c: Context | HonoContext): Promise<Response> {
-    let databaseId = c.env.NOTION_DATABASE_ID
-    let client = new NotionApiClient(c.env.NOTION_TOKEN)
+async function getAllFilms(databaseId: string, token: string): Promise<Film[]> {
+    let client = new NotionApiClient(token)
     let data = await client.fetchDatabase(databaseId)
-    return (new OkResponse({films: DatabaseQueryResponse.toFilms(data)})).asJsonResponse(c)
+    return DatabaseQueryResponse.toFilms(data)
+}
+
+export async function getFilms(c: Context | HonoContext): Promise<Response> {
+    return (new OkResponse({ films: getAllFilms(c.env.NOTION_DATABASE_ID, c.env.NOTION_TOKEN) })).asJsonResponse(c)
+}
+
+export async function getFilm(c: Context | HonoContext) {
+    let uniqueName = c.req.param("id")
+    let films = await getAllFilms(c.env.NOTION_DATABASE_ID, c.env.NOTION_TOKEN)
+    let selectedFilms = films.filter((f) => f.id === uniqueName)
+    if (selectedFilms.length === 0) {
+        return (new FilmDontExists()).asJsonResponse(c)
+    }
+    return (new OkResponse(selectedFilms[0])).asJsonResponse(c)
 }

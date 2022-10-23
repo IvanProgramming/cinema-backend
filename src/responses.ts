@@ -46,3 +46,9 @@ export class NotFoundError extends ErrorResponse {
         super(1, "Endpoint not found", 404)
     }
 }
+
+export class FilmDontExists extends ErrorResponse {
+	constructor() {
+		super(2, "Film with specified ID don't exists", 404)
+	}
+}
